@@ -24,12 +24,17 @@ export async function authMiddleware(req, res, next) {
 }
 
 export async function optionalAuth(req, res, next) {
+  // Log para debug
+  console.log('optionalAuth called - method:', req.method, 'path:', req.path);
+  console.log('optionalAuth - authorization header:', req.headers.authorization ? 'present' : 'missing');
+  
   // Sempre permitir continuar, mesmo sem autenticação
   req.user = null;
   
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('optionalAuth - no auth header, continuing');
       return next();
     }
     

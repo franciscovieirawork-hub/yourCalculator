@@ -25,14 +25,20 @@ console.log('FRONTEND_URL:', FRONTEND_URL);
 
 app.use(cors({ 
   origin: (origin, callback) => {
+    // Log para debug
+    console.log('CORS request from origin:', origin);
     // Permitir requests sem origin (mobile apps, Postman, etc) ou se estiver na lista
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // Por agora permitir todas para debug
+      // Por agora permitir todas para debug
+      console.log('Allowing origin (not in list):', origin);
+      callback(null, true);
     }
   },
-  credentials: true 
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json({ limit: '2mb' }));
 

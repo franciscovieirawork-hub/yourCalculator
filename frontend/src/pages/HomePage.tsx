@@ -21,7 +21,14 @@ export function HomePage() {
   useEffect(() => {
     const url = apiUrl('/calculators');
     console.log('Fetching calculators from:', url);
-    fetch(url)
+    fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // Não enviar credentials para evitar problemas de CORS
+      credentials: 'omit',
+    })
       .then((r) => {
         if (!r.ok) {
           console.error('Failed to fetch calculators:', r.status, r.statusText);

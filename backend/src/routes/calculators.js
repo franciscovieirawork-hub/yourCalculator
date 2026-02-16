@@ -9,9 +9,20 @@ calculatorsRouter.get('/test', (req, res) => {
   res.json({ message: 'Calculators router working', calculators: CALCULATOR_LIST.length });
 });
 
+// Endpoint completamente público sem middleware (para debug)
+calculatorsRouter.get('/public', (req, res) => {
+  res.json({
+    calculators: CALCULATOR_LIST,
+    profile: null,
+    message: 'Public endpoint - no auth middleware',
+  });
+});
+
 // Lista de calculadoras (público; opcionalmente enriquecido com perfil para prefill)
 calculatorsRouter.get('/', optionalAuth, async (req, res) => {
   try {
+    console.log('GET /calculators - user:', req.user ? req.user.id : 'null');
+    console.log('GET /calculators - headers:', JSON.stringify(req.headers));
     res.json({
       calculators: CALCULATOR_LIST,
       profile: req.user?.profile ?? null,
