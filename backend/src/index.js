@@ -7,35 +7,29 @@ import { documentsRouter } from './routes/documents.js';
 import { calculatorsRouter } from './routes/calculators.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// CORS: permitir frontend em produção e desenvolvimento
-const allowedOrigins = [
-  FRONTEND_URL,
-  'https://atuacalcoladora.vercel.app',
-  'https://yourcalculator-frontend.vercel.app',
-  'https://your-calculator-black.vercel.app',
-  'http://localhost:5173',
-];
+// Middleware CORS manual ANTES de tudo (para garantir que funciona no Vercel)
+app.use((req, res, next) => {
+  // Permitir todas as origens
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.header('Access-Control-Max-Age', '86400');
+  
+  // Responder imediatamente a OPTIONS (preflight)
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  
+  next();
+});
 
-// Normalizar FRONTEND_URL para garantir que está na lista
-if (FRONTEND_URL && !FRONTEND_URL.startsWith('http')) {
-  allowedOrigins.push(`https://${FRONTEND_URL}`);
-}
-
-// Log para debug
-console.log('CORS allowed origins:', allowedOrigins);
-console.log('FRONTEND_URL:', FRONTEND_URL);
-
-// CORS simplificado - permitir todas as origens temporariamente para debug
+// CORS middleware adicional (backup)
 app.use(cors({
-  origin: true, // Permitir todas as origens
-  credentials: true,
+  origin: '*',
+  credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
-  exposedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200
 }));
 
 app.use(express.json({ limit: '2mb' }));
@@ -49,6 +43,7 @@ app.get('/api/health', (_, res) => res.json({ ok: true }));
 
 // Vercel serverless functions não precisam de listen()
 // Mas em desenvolvimento local sim
+const PORT = process.env.PORT || 3001;
 if (process.env.VERCEL !== '1') {
   app.listen(PORT, () => {
     console.log(`Backend running at http://localhost:${PORT}`);
