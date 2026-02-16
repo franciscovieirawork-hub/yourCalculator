@@ -17,7 +17,7 @@ export function Layout({ children }: { children?: React.ReactNode }) {
             <p className="text-sm text-slate-500">
               Criado por{' '}
               <a
-                href="https://f-vdev.vercel.app/"
+                href="https://fvdev.vercel.app/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="font-medium text-bank-navy hover:text-primary-600 transition-colors"
