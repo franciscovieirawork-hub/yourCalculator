@@ -24,44 +24,20 @@ if (FRONTEND_URL && !FRONTEND_URL.startsWith('http')) {
   allowedOrigins.push(`https://${FRONTEND_URL}`);
 }
 
-// Log para debug (remover em produção se necessário)
+// Log para debug
 console.log('CORS allowed origins:', allowedOrigins);
 console.log('FRONTEND_URL:', FRONTEND_URL);
 
-// Handler manual para OPTIONS (preflight) antes do CORS
-app.options('*', (req, res) => {
-  const origin = req.headers.origin;
-  console.log('OPTIONS preflight from:', origin);
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.header('Access-Control-Allow-Origin', origin || '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', 'true');
-    res.header('Access-Control-Max-Age', '86400'); // 24 horas
-    return res.sendStatus(200);
-  }
-  res.sendStatus(403);
-});
-
-app.use(cors({ 
-  origin: (origin, callback) => {
-    // Log para debug
-    console.log('CORS request from origin:', origin);
-    // Permitir requests sem origin (mobile apps, Postman, etc) ou se estiver na lista
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      // Por agora permitir todas para debug
-      console.log('Allowing origin (not in list):', origin);
-      callback(null, true);
-    }
-  },
+// CORS simplificado - permitir todas as origens temporariamente para debug
+app.use(cors({
+  origin: true, // Permitir todas as origens
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   exposedHeaders: ['Content-Type', 'Authorization'],
-  optionsSuccessStatus: 200 // Para alguns browsers antigos
+  optionsSuccessStatus: 200
 }));
+
 app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/auth', authRouter);
