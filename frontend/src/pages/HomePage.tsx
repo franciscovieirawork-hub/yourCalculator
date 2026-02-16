@@ -19,9 +19,7 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const url = apiUrl('/calculators');
-    console.log('Fetching calculators from:', url);
-    fetch(url, {
+    fetch(apiUrl('/calculators'), {
       method: 'GET',
       mode: 'cors',
       credentials: 'omit',

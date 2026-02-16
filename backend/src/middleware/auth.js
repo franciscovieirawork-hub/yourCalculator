@@ -24,22 +24,16 @@ export async function authMiddleware(req, res, next) {
 }
 
 export async function optionalAuth(req, res, next) {
-  // IMPORTANTE: OPTIONS requests não devem passar por autenticação
+  // OPTIONS requests não devem passar por autenticação
   if (req.method === 'OPTIONS') {
     return next();
   }
   
-  // Log para debug
-  console.log('optionalAuth called - method:', req.method, 'path:', req.path);
-  console.log('optionalAuth - authorization header:', req.headers.authorization ? 'present' : 'missing');
-  
-  // Sempre permitir continuar, mesmo sem autenticação
   req.user = null;
   
   try {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('optionalAuth - no auth header, continuing');
       return next();
     }
     
@@ -54,7 +48,6 @@ export async function optionalAuth(req, res, next) {
         return next();
       }
       
-      // Tentar buscar utilizador, mas não falhar se não conseguir
       try {
         const user = await prisma.user.findUnique({
           where: { id: decoded.userId },
@@ -64,18 +57,15 @@ export async function optionalAuth(req, res, next) {
           req.user = user;
         }
       } catch (dbError) {
-        // Erro na base de dados - log mas continua sem autenticação
+        // Erro na base de dados - continua sem autenticação
         console.error('Database error in optionalAuth:', dbError);
       }
     } catch (tokenError) {
-      // Token inválido - não é erro, apenas não autenticado
-      // Não fazer nada, já definimos req.user = null acima
+      // Token inválido - continua sem autenticação
     }
   } catch (error) {
-    // Erro inesperado - log mas continua sem autenticação
     console.error('Unexpected error in optionalAuth:', error);
   }
   
-  // Sempre chamar next(), mesmo em caso de erro
   return next();
 }
