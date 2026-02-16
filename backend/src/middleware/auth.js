@@ -24,25 +24,48 @@ export async function authMiddleware(req, res, next) {
 }
 
 export async function optionalAuth(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    req.user = null;
-    return next();
-  }
-  const token = authHeader.slice(7);
+  // Sempre permitir continuar, mesmo sem autenticação
+  req.user = null;
+  
   try {
-    const decoded = jwt.verify(token, JWT_SECRET);
-    if (!decoded?.userId) {
-      req.user = null;
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return next();
     }
-    const user = await prisma.user.findUnique({
-      where: { id: decoded.userId },
-      include: { profile: true },
-    });
-    req.user = user || null;
-  } catch {
-    req.user = null;
+    
+    const token = authHeader.slice(7);
+    if (!token) {
+      return next();
+    }
+    
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET);
+      if (!decoded?.userId) {
+        return next();
+      }
+      
+      // Tentar buscar utilizador, mas não falhar se não conseguir
+      try {
+        const user = await prisma.user.findUnique({
+          where: { id: decoded.userId },
+          include: { profile: true },
+        });
+        if (user) {
+          req.user = user;
+        }
+      } catch (dbError) {
+        // Erro na base de dados - log mas continua sem autenticação
+        console.error('Database error in optionalAuth:', dbError);
+      }
+    } catch (tokenError) {
+      // Token inválido - não é erro, apenas não autenticado
+      // Não fazer nada, já definimos req.user = null acima
+    }
+  } catch (error) {
+    // Erro inesperado - log mas continua sem autenticação
+    console.error('Unexpected error in optionalAuth:', error);
   }
-  next();
+  
+  // Sempre chamar next(), mesmo em caso de erro
+  return next();
 }

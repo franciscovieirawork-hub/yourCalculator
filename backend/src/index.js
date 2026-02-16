@@ -19,6 +19,10 @@ const allowedOrigins = [
   'http://localhost:5173',
 ];
 
+// Log para debug (remover em produção se necessário)
+console.log('CORS allowed origins:', allowedOrigins);
+console.log('FRONTEND_URL:', FRONTEND_URL);
+
 app.use(cors({ 
   origin: (origin, callback) => {
     // Permitir requests sem origin (mobile apps, Postman, etc) ou se estiver na lista

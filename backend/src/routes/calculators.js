@@ -4,12 +4,22 @@ import { CALCULATOR_LIST } from '../data/calculators.js';
 
 export const calculatorsRouter = Router();
 
+// Endpoint de teste sem middleware (para debug)
+calculatorsRouter.get('/test', (req, res) => {
+  res.json({ message: 'Calculators router working', calculators: CALCULATOR_LIST.length });
+});
+
 // Lista de calculadoras (público; opcionalmente enriquecido com perfil para prefill)
-calculatorsRouter.get('/', optionalAuth, (req, res) => {
-  res.json({
-    calculators: CALCULATOR_LIST,
-    profile: req.user?.profile ?? null,
-  });
+calculatorsRouter.get('/', optionalAuth, async (req, res) => {
+  try {
+    res.json({
+      calculators: CALCULATOR_LIST,
+      profile: req.user?.profile ?? null,
+    });
+  } catch (error) {
+    console.error('Error in GET /calculators:', error);
+    res.status(500).json({ error: 'Erro ao carregar calculadoras' });
+  }
 });
 
 // Metadados de uma calculadora por slug
