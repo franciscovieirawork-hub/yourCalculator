@@ -1,0 +1,90 @@
+// Prisma schema - Portugal Calculators
+// Leis vigentes em 2026
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String?
+  phoneNumber String? @unique // Telemóvel para recuperação por SMS (formato: +351912345678)
+  securityQuestion String?  // Pergunta de segurança para recuperação
+  securityAnswer   String?  // Resposta (hashed)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profile UserProfile?
+  savedDocuments SavedDocument[]
+  passwordResetCodes PasswordResetCode[]
+}
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Situação fiscal (para IRS e retenção)
+  taxSituation       String?  // "single" | "married_one_holder" | "married_two_holders"
+  numberOfDependents Int      @default(0)
+  irsRegime          String?  // "joint" | "separate" - casado
+  region             String?  // "mainland" | "madeira" | "azores" - salário mínimo
+
+  // Benefícios e opções
+  adse               Boolean  @default(false)
+  irsJovem           Boolean  @default(false)  // até 35 anos
+  mealAllowance      Float?   // valor/dia subsídio alimentação
+  mealAllowanceTaxFree Boolean @default(true)  // isento até 6€/dia em 2026
+
+  // Duodécimos (subsídios em 12 meses)
+  twelfthHoliday     Boolean  @default(false)
+  twelfthChristmas   Boolean  @default(false)
+
+  // Trabalhador independente
+  selfEmployed       Boolean  @default(false)
+  activityCode       String?  // código CAE para retenção recibos verdes
+  firstYearActivity  Boolean  @default(false)
+
+  // Imobiliário (para IMI/IMT)
+  municipality       String?  // concelho para taxa IMI
+  municipalityTaxRate Float?  // taxa IMI opcional (0.3 - 0.45)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SavedDocument {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  title       String   // ex: "Salário Líquido - Jan 2026"
+  calculatorId String  // slug da calculadora (ex: salario-liquido)
+  calculatorName String
+  content     String   @db.Text // JSON com inputs e resultados
+  pdfBlob     String?  @db.Text // base64 ou URL; ou gerar on-the-fly
+
+  createdAt   DateTime @default(now())
+
+  @@index([userId])
+}
+
+model PasswordResetCode {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code      String   // Código de 6 dígitos (hashed)
+  phoneNumber String // Telemóvel usado
+  expiresAt DateTime // Expira em 10 minutos
+  used      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId, expiresAt])
+}
