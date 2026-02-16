@@ -8,26 +8,36 @@ import { calculatorsRouter } from './routes/calculators.js';
 
 const app = express();
 
-// Middleware CORS manual ANTES de tudo (para garantir que funciona no Vercel)
-app.use((req, res, next) => {
-  // Permitir todas as origens
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
-  res.header('Access-Control-Max-Age', '86400');
-  
-  // Responder imediatamente a OPTIONS (preflight)
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
-  }
-  
-  next();
-});
+// CORS configurado dinamicamente baseado em variáveis de ambiente
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const allowedOrigins = [
+  FRONTEND_URL,
+  'https://atuacalcoladora.vercel.app',
+  'https://yourcalculator-frontend.vercel.app',
+  'https://your-calculator-black.vercel.app',
+  'http://localhost:5173',
+];
 
-// CORS middleware adicional (backup)
+console.log('CORS allowed origins:', allowedOrigins);
+console.log('FRONTEND_URL:', FRONTEND_URL);
+
+// CORS com origem dinâmica
 app.use(cors({
-  origin: '*',
-  credentials: false,
+  origin: (origin, callback) => {
+    // Permitir requests sem origin (mobile apps, Postman, etc)
+    if (!origin) {
+      return callback(null, true);
+    }
+    // Verificar se está na lista de origens permitidas
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      // Por agora permitir todas para debug
+      console.log('Allowing origin (not in list):', origin);
+      callback(null, true);
+    }
+  },
+  credentials: false, // Não usar credentials com wildcard
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
 }));
