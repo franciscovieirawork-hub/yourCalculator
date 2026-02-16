@@ -24,6 +24,11 @@ export async function authMiddleware(req, res, next) {
 }
 
 export async function optionalAuth(req, res, next) {
+  // IMPORTANTE: OPTIONS requests não devem passar por autenticação
+  if (req.method === 'OPTIONS') {
+    return next();
+  }
+  
   // Log para debug
   console.log('optionalAuth called - method:', req.method, 'path:', req.path);
   console.log('optionalAuth - authorization header:', req.headers.authorization ? 'present' : 'missing');

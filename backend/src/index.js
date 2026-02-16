@@ -8,26 +8,22 @@ import { calculatorsRouter } from './routes/calculators.js';
 
 const app = express();
 
-// CORS configurado dinamicamente
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-const allowedOrigins = [
-  FRONTEND_URL,
-  'https://atuacalcoladora.vercel.app',
-  'https://yourcalculator-frontend.vercel.app',
-  'https://your-calculator-black.vercel.app',
-  'http://localhost:5173',
-];
-
-console.log('CORS allowed origins:', allowedOrigins);
-
-// CORS middleware - SIMPLIFICADO E CORRETO
+// CORS - DEVE SER O PRIMEIRO MIDDLEWARE
 app.use(cors({
-  origin: '*', // Permitir todas as origens
+  origin: '*',
   credentials: false,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   optionsSuccessStatus: 200
 }));
+
+// Handler explícito para OPTIONS ANTES de qualquer outro middleware
+app.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.sendStatus(200);
+});
 
 app.use(express.json({ limit: '2mb' }));
 
