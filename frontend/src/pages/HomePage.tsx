@@ -23,10 +23,7 @@ export function HomePage() {
     console.log('Fetching calculators from:', url);
     fetch(url, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      // Não enviar credentials para evitar problemas de CORS
+      mode: 'cors',
       credentials: 'omit',
     })
       .then((r) => {
