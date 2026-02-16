@@ -19,12 +19,24 @@ export function HomePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch(apiUrl('/calculators'))
-      .then((r) => r.json())
+    const url = apiUrl('/calculators');
+    console.log('Fetching calculators from:', url);
+    fetch(url)
+      .then((r) => {
+        if (!r.ok) {
+          console.error('Failed to fetch calculators:', r.status, r.statusText);
+          throw new Error(`HTTP ${r.status}`);
+        }
+        return r.json();
+      })
       .then((data) => {
+        console.log('Calculators loaded:', data.calculators?.length || 0);
         setCalculators(data.calculators || []);
       })
-      .catch(() => setCalculators([]))
+      .catch((err) => {
+        console.error('Error loading calculators:', err);
+        setCalculators([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 

@@ -10,7 +10,26 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-app.use(cors({ origin: FRONTEND_URL, credentials: true }));
+// CORS: permitir frontend em produção e desenvolvimento
+const allowedOrigins = [
+  FRONTEND_URL,
+  'https://atuacalcoladora.vercel.app',
+  'https://yourcalculator-frontend.vercel.app',
+  'https://your-calculator-black.vercel.app',
+  'http://localhost:5173',
+];
+
+app.use(cors({ 
+  origin: (origin, callback) => {
+    // Permitir requests sem origin (mobile apps, Postman, etc) ou se estiver na lista
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Por agora permitir todas para debug
+    }
+  },
+  credentials: true 
+}));
 app.use(express.json({ limit: '2mb' }));
 
 app.use('/api/auth', authRouter);
