@@ -17,7 +17,7 @@ export function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await login(loginMethod === 'email' ? email : undefined, password, loginMethod === 'phone' ? phoneNumber : undefined);
+      await login(password, loginMethod === 'email' ? email : undefined, loginMethod === 'phone' ? phoneNumber : undefined);
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao iniciar sessão');

@@ -35,7 +35,7 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (email?: string, password: string, phoneNumber?: string) => Promise<void>;
+  login: (password: string, email?: string, phoneNumber?: string) => Promise<void>;
   register: (email: string, password: string, name?: string, securityQuestion?: string, securityAnswer?: string, phoneNumber?: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -72,7 +72,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .catch(() => setState((s) => ({ ...s, user: null, token: null, loading: false })));
   }, [state.token, fetchUser]);
 
-  const login = async (email?: string, password: string = '', phoneNumber?: string) => {
+  const login = async (password: string, email?: string, phoneNumber?: string) => {
     const res = await fetch(apiUrl('/auth/login'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
