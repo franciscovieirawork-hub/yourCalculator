@@ -1,49 +1,49 @@
 # YourCalculator
 
-Calculadoras fiscais e financeiras para Portugal (ano 2026). Site público com opção de registo para guardar perfil e documentos.
+Tax and financial calculators for Portugal (2026). Public website with optional registration to save profile and documents.
 
 ## Stack
 
 - **Frontend:** React (Vite), TypeScript, Tailwind CSS, React Router, jsPDF
 - **Backend:** Node.js, Express, Prisma
-- **Base de dados:** PostgreSQL
+- **Database:** PostgreSQL
 
-## Pré-requisitos
+## Prerequisites
 
 - Node.js 18+
 - PostgreSQL
-- npm ou yarn
+- npm or yarn
 
-## Instalação
+## Installation
 
-1. Clonar o repositório e instalar dependências:
+1. Clone the repository and install dependencies:
 
 ```bash
 cd yourCalculator
 npm install
 ```
 
-2. Configurar a base de dados. Criar ficheiro `backend/.env` a partir do exemplo:
+2. Configure the database. Create `backend/.env` file from the example:
 
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Editar `backend/.env` e definir:
+Edit `backend/.env` and set:
 
-- `DATABASE_URL` – connection string PostgreSQL (ex: `postgresql://user:password@localhost:5432/yourcalculator`)
-- `JWT_SECRET` – chave secreta para tokens (produção: usar valor forte)
-- `PORT` – porta do backend (ex: 3001)
-- `FRONTEND_URL` – URL do frontend (ex: http://localhost:5173)
+- `DATABASE_URL` – PostgreSQL connection string (e.g., `postgresql://user:password@localhost:5432/yourcalculator`)
+- `JWT_SECRET` – secret key for tokens (production: use strong value)
+- `PORT` – backend port (e.g., 3001)
+- `FRONTEND_URL` – frontend URL (e.g., http://localhost:5173)
 
-3. Criar a base de dados e gerar o cliente Prisma:
+3. Create the database and generate Prisma client:
 
 ```bash
 npm run db:generate
 npm run db:push
 ```
 
-4. Iniciar desenvolvimento (backend + frontend em paralelo):
+4. Start development (backend + frontend in parallel):
 
 ```bash
 npm run dev
@@ -52,40 +52,40 @@ npm run dev
 - Frontend: http://localhost:5173  
 - Backend: http://localhost:3001  
 
-## Estrutura
+## Structure
 
-- `frontend/` – aplicação React (calculadoras, perfil, documentos, auth)
-- `backend/` – API REST (auth, perfil, documentos, listagem de calculadoras)
-- `backend/prisma/schema.prisma` – modelos User, UserProfile, SavedDocument
-- `backend/src/constants/pt-2026.js` – constantes fiscais Portugal 2026 (IRS, TSU, IAS, etc.)
+- `frontend/` – React application (calculators, profile, documents, auth)
+- `backend/` – REST API (auth, profile, documents, calculator listing)
+- `backend/prisma/schema.prisma` – User, UserProfile, SavedDocument models
+- `backend/src/constants/pt-2026.js` – Portugal 2026 tax constants (IRS, TSU, IAS, etc.)
 
-## Funcionalidades
+## Features
 
-- **Público:** Todas as calculadoras acessíveis sem login; pesquisa e filtro por categoria.
-- **Registo/Login:** Opcional; permite guardar perfil (situação fiscal, duodécimos, ADSE, IRS Jovem, região, etc.) e preencher automaticamente as calculadoras.
-- **Perfil:** Dados para IRS, SS, recibos verdes, IMI (concelho/taxa), etc.
-- **Documentos:** Guardar simulações com título; listar, abrir PDF em nova janela e eliminar.
-- **PDF:** Exportar resultado da calculadora para PDF (abre no browser) ou guardar como documento na conta.
+- **Public:** All calculators accessible without login; search and filter by category.
+- **Register/Login:** Optional; allows saving profile (tax situation, duodécimos, ADSE, IRS Jovem, region, etc.) and automatically filling calculators.
+- **Profile:** Data for IRS, SS, recibos verdes, IMI (municipality/rate), etc.
+- **Documents:** Save simulations with title; list, open PDF in new window and delete.
+- **PDF:** Export calculator result to PDF (opens in browser) or save as document in account.
 
-## Calculadoras (Portugal 2026)
+## Calculators (Portugal 2026)
 
-Incluídas entre outras:
+Included among others:
 
-- Salário líquido / bruto necessário, retenção na fonte, horas extras, custo patrão
-- Recibos verdes, rendimento relevante SS
-- Subsídios férias/Natal, férias proporcionais, indemnizações cessação
-- Simulador IRS, escalões IRS, IRS casal, deduções E-fatura, múltiplas fontes
-- Contribuições SS, subsídio desemprego, doença/parentalidade, reforma, prestações sociais
-- IMI, IMT, crédito habitação
-- IUC, depreciação veículo
-- Orçamento pessoal, poupança/juros compostos, amortização dívida
-- Custo real funcionário, periodização salários, custos formação
-- NHR, comparativo anos, comparação cenários, benefícios (stock options, etc.)
+- Net salary / required gross, tax withholding, overtime, employer cost
+- Recibos verdes, relevant SS income
+- Holiday/Christmas allowances, proportional holidays, termination indemnities
+- IRS simulator, IRS brackets, couple IRS, E-fatura deductions, multiple income sources
+- SS contributions, unemployment benefit, sickness/parental leave, pension, social benefits
+- IMI, IMT, housing credit
+- IUC, vehicle depreciation
+- Personal budget, savings/compound interest, debt amortization
+- Real employee cost, salary periodization, training costs
+- NHR, year comparison, scenario comparison, benefits (stock options, etc.)
 
-*Constantes e fórmulas baseadas na legislação vigente em 16/02/2026; valores indicativos.*
+*Constants and formulas based on legislation in effect on 16/02/2026; indicative values.*
 
-## Comandos úteis
+## Useful Commands
 
-- `npm run dev` – backend + frontend em modo desenvolvimento
-- `npm run db:studio` – abrir Prisma Studio para a base de dados
-- `npm run build` – build do backend e frontend
+- `npm run dev` – backend + frontend in development mode
+- `npm run db:studio` – open Prisma Studio for the database
+- `npm run build` – build backend and frontend
