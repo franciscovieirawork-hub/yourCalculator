@@ -19,9 +19,29 @@ const allowedOrigins = [
   'http://localhost:5173',
 ];
 
+// Normalizar FRONTEND_URL para garantir que está na lista
+if (FRONTEND_URL && !FRONTEND_URL.startsWith('http')) {
+  allowedOrigins.push(`https://${FRONTEND_URL}`);
+}
+
 // Log para debug (remover em produção se necessário)
 console.log('CORS allowed origins:', allowedOrigins);
 console.log('FRONTEND_URL:', FRONTEND_URL);
+
+// Handler manual para OPTIONS (preflight) antes do CORS
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  console.log('OPTIONS preflight from:', origin);
+  if (!origin || allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 horas
+    return res.sendStatus(200);
+  }
+  res.sendStatus(403);
+});
 
 app.use(cors({ 
   origin: (origin, callback) => {
@@ -37,8 +57,10 @@ app.use(cors({
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200 // Para alguns browsers antigos
 }));
 app.use(express.json({ limit: '2mb' }));
 
